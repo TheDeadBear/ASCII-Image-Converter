@@ -1,17 +1,20 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from ascii_magic import AsciiArt
-from PIL import Image, ImageEnhance
+from PIL import Image
 import io
 import traceback
 
+# Import configuration from ascii_convert_detailed.py
+from ascii_convert_detailed import (
+    DEFAULT_COLUMNS,
+    DEFAULT_CHAR_SET,
+    DEFAULT_MONOCHROME,
+    ENHANCE_CONTRAST
+)
+from ascii_magic import AsciiArt
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
-
-# Settings from existing Python scripts
-DEFAULT_COLUMNS = 120
-DEFAULT_CHAR_SET = " .'`^\",:;Il!i~+_-?][}{1)(|\\/*tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-DEFAULT_MONOCHROME = True
 
 @app.route('/')
 def index():
@@ -37,9 +40,9 @@ def convert():
 
         print(f"Processing file: {file.filename}")
         
-        # Get parameters from form
+        # Get parameters from form (use settings from ascii_convert_detailed.py)
         columns = int(request.form.get('columns', DEFAULT_COLUMNS))
-        contrast = float(request.form.get('contrast', 1.5))
+        contrast = float(request.form.get('contrast', ENHANCE_CONTRAST))
         
         print(f"Columns: {columns}, Contrast: {contrast}")
         
@@ -47,8 +50,9 @@ def convert():
         img = Image.open(file.stream)
         print(f"Image opened: {img.size}")
         
-        # Apply contrast if needed
+        # Apply contrast enhancement (using logic from ascii_convert_detailed.py)
         if contrast != 1.0:
+            from PIL import ImageEnhance
             enhancer = ImageEnhance.Contrast(img)
             img = enhancer.enhance(contrast)
         
