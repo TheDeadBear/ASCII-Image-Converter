@@ -4,8 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASCII Image Converter</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>ASCII Image Converter</h1>
+        
+        <div class="upload-section">
+            <form id="convertForm">
+                <div class="form-group">
+                    <label for="imageInput">Upload Image:</label>
+                    <input type="file" id="imageInput" accept="image/*" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="columns">Width (columns):</label>
+                        <input type="number" id="columns" value="120" min="40" max="600">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contrast">Contrast:</label>
+                        <input type="number" id="contrast" value="1.5" step="0.1" min="0.5" max="3.0">
+                    </div>
+                </div>
+                
+                <button type="submit" id="convertBtn">Convert to ASCII</button>
+            </form>
+        </div>
+        
+        <div id="status" class="status"></div>
+        
+        <div id="outputSection" class="output-section" style="display: none;">
+            <div class="button-group">
+                <button id="copyBtn">Copy to Clipboard</button>
+                <button id="downloadBtn">Download TXT</button>
+            </div>
+            <pre id="output"></pre>
+        </div>
+    </div>
     
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
