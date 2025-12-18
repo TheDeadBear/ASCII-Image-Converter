@@ -32,6 +32,7 @@ form.addEventListener('submit', async (e) => {
     formData.append('image', imageInput.files[0]);
     formData.append('columns', columnsInput.value);
     formData.append('contrast', contrastInput.value);
+    formData.append('monochrome', document.querySelector('input[name="monochrome"]:checked').value);
     
     try {
         const response = await fetch('/convert', {
@@ -46,7 +47,8 @@ form.addEventListener('submit', async (e) => {
         }
         
         asciiText = data.ascii;
-        output.textContent = asciiText;
+        htmlContent = data.html;
+        output.innerHTML = htmlContent;
         
         const lines = asciiText.split('\n').length;
         statusEl.textContent = `✅ Converted! ${lines} lines`;
