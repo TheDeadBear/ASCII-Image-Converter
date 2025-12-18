@@ -88,48 +88,36 @@ downloadBtn.addEventListener('click', () => {
     statusEl.className = 'status success';
 });
 
-downloadPngBtn.addEventListener('click', () => {
-    // Create canvas for ASCII art rendering
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Configure font and get measurements
-    const fontSize = 12;
-    const fontFamily = 'Courier New, monospace';
-    ctx.font = `${fontSize}px ${fontFamily}`;
-    
-    // Calculate canvas dimensions based on ASCII text
-    const lines = asciiText.split('\n');
-    const maxLineLength = Math.max(...lines.map(line => line.length));
-    const charWidth = ctx.measureText('M').width; // Monospace character width
-    const lineHeight = fontSize * 1.2; // Line spacing
-    
-    canvas.width = Math.ceil(maxLineLength * charWidth) + 40; // Add padding
-    canvas.height = Math.ceil(lines.length * lineHeight) + 40; // Add padding
-    
-    // Fill background
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw ASCII text
-    ctx.fillStyle = '#00ff00';
-    ctx.font = `${fontSize}px ${fontFamily}`;
-    ctx.textBaseline = 'top';
-    
-    lines.forEach((line, index) => {
-        ctx.fillText(line, 20, 20 + (index * lineHeight));
-    });
-    
-    // Convert canvas to blob and download
-    canvas.toBlob((blob) => {
+downloadPngBtn.addEventListener('click', async () => {
+    // Trigger download from server-generated PNG
+    try {
+        const formData = new FormData();
+        formData.append('image', imageInput.files[0]);
+        formData.append('columns', columnsInput.value);
+        formData.append('contrast', contrastInput.value);
+        formData.append('monochrome', document.querySelector('input[name="monochrome"]:checked').value);
+
+        const response = await fetch('/download', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate PNG');
+        }
+
+        const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'ascii-art.png';
+        a.download = 'ascii_image.png';
         a.click();
         URL.revokeObjectURL(url);
         
         statusEl.textContent = '✅ Downloaded as PNG! Image saved successfully.';
         statusEl.className = 'status success';
-    }, 'image/png');
+    } catch (error) {
+        statusEl.textContent = `❌ Error: ${error.message}`;
+        statusEl.className = 'status error';
+    }
 });
