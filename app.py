@@ -43,6 +43,7 @@ def convert():
         # Get parameters from form (use settings from ascii_convert_detailed.py)
         columns = int(request.form.get('columns', DEFAULT_COLUMNS))
         contrast = float(request.form.get('contrast', ENHANCE_CONTRAST))
+        monochrome = request.form.get('monochrome', str(DEFAULT_MONOCHROME)).lower() == 'true'
         
         print(f"Columns: {columns}, Contrast: {contrast}")
         
@@ -61,12 +62,12 @@ def convert():
         ascii_text = art.to_ascii(
             columns=columns,
             char=DEFAULT_CHAR_SET,
-            monochrome=False
+            monochrome=monochrome
         )
         html_ascii = art.to_html(
             columns=columns,
             char=DEFAULT_CHAR_SET,
-            monochrome=False
+            monochrome=monochrome
         )
         print(f"Conversion successful, {len(ascii_text)} characters")
         return jsonify({'ascii': ascii_text, 'html': html_ascii}), 200

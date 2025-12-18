@@ -32,6 +32,7 @@ form.addEventListener('submit', async (e) => {
     formData.append('image', imageInput.files[0]);
     formData.append('columns', columnsInput.value);
     formData.append('contrast', contrastInput.value);
+    formData.append('monochrome', document.querySelector('input[name="monochrome"]:checked').value);
     
     try {
         const response = await fetch('/convert', {
