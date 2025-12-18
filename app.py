@@ -61,11 +61,15 @@ def convert():
         ascii_text = art.to_ascii(
             columns=columns,
             char=DEFAULT_CHAR_SET,
-            monochrome=DEFAULT_MONOCHROME
+            monochrome=False
         )
-        
+        html_ascii = art.to_html(
+            columns=columns,
+            char=DEFAULT_CHAR_SET,
+            monochrome=False
+        )
         print(f"Conversion successful, {len(ascii_text)} characters")
-        return jsonify({'ascii': ascii_text}), 200
+        return jsonify({'ascii': ascii_text, 'html': html_ascii}), 200
     
     except Exception as e:
         print(f"Error: {str(e)}")

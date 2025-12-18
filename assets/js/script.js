@@ -46,7 +46,8 @@ form.addEventListener('submit', async (e) => {
         }
         
         asciiText = data.ascii;
-        output.textContent = asciiText;
+        htmlContent = data.html;
+        output.innerHTML = htmlContent;
         
         const lines = asciiText.split('\n').length;
         statusEl.textContent = `✅ Converted! ${lines} lines`;
