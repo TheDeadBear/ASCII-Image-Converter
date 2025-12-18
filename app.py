@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from PIL import Image
 import io
+import os
 import traceback
 
 # Import configuration from ascii_convert_detailed.py
@@ -71,6 +72,50 @@ def convert():
         )
         print(f"Conversion successful, {len(ascii_text)} characters")
         return jsonify({'ascii': ascii_text, 'html': html_ascii}), 200
+    
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/download', methods=['POST'])
+def download():
+    try:
+        if 'image' not in request.files:
+            print("No image in request")
+            return jsonify({'error': 'No image uploaded'}), 400
+        
+        file = request.files['image']
+        if file.filename == '':
+            print("Empty filename")
+            return jsonify({'error': 'No file selected'}), 400
+        
+        filepath = os.path.dirname(os.path.abspath(__file__))
+
+        # Get parameters from form (use settings from ascii_convert_detailed.py)
+        columns = int(request.form.get('columns', DEFAULT_COLUMNS))
+        contrast = float(request.form.get('contrast', ENHANCE_CONTRAST))
+        monochrome = request.form.get('monochrome', str(DEFAULT_MONOCHROME)).lower() == 'true'
+        
+        # Open image with Pillow
+        img = Image.open(file.stream)
+        
+        # Apply contrast enhancement (using logic from ascii_convert_detailed.py)
+        if contrast != 1.0:
+            from PIL import ImageEnhance
+            enhancer = ImageEnhance.Contrast(img)
+            img = enhancer.enhance(contrast)
+        
+        # Convert to ASCII using your existing method
+        art = AsciiArt.from_pillow_image(img)
+        art.to_image_file(
+            path=os.path.join(filepath, 'ascii_image.png'),
+            columns=columns,
+            char=DEFAULT_CHAR_SET,
+            monochrome=monochrome
+        )
+        return send_file(os.path.join(filepath, 'ascii_image.png'), mimetype='image/png', as_attachment=True)
     
     except Exception as e:
         print(f"Error: {str(e)}")
